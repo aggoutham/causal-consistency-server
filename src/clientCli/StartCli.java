@@ -2,7 +2,6 @@ package clientCli;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -31,10 +30,11 @@ public class StartCli {
 	public void enableInputs() {
 		
 		try {
-			
-			dcSocket = new Socket(connectedDCIP,connectedDCPort);
 			int s = postRegisterMessage();
-			
+			if(s==0) {
+				System.out.println("ERR:: Registration with Data Center Failed!");
+				return;
+			}
 			System.out.println("\n\n$$$$$$ Welcome to Causal Consistency Interactive Shell $$$$$$");
 	        System.out.println("List out one (OR multiple) messages seperated by new line characters :- \n");
 	        System.out.println("Example1 - READ,<key_name>");
@@ -60,14 +60,9 @@ public class StartCli {
 	            }
 	            sc.close();
 	        }
-	        return;
-	        
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	        return;       
+		} catch (Exception e) {
+			System.out.println(e);
 		}
 		
         
@@ -98,8 +93,13 @@ public class StartCli {
 			else {
 				variable = parts[1];
 				writedata = parts[2];
-				postWriteMessage("WRITE",variable,writedata);
-				System.out.println("WRITE operation was successful !!!");
+				int s = postWriteMessage("WRITE",variable,writedata);
+				if(s==1) {
+					System.out.println("WRITE operation was successful !!!");
+				}
+				else {
+					System.out.println("ERR:: WRITE operation failed");
+				}
 			}		
 		} else {
 			System.out.println("ERR::Invalid Input::Supports only READ and WRITE operations.");
@@ -112,35 +112,87 @@ public class StartCli {
 	
 	
 	public String postReadMessage(String op, String variable) {
-		String resVal = "";
-		
-		
-		
-		return resVal;
+		String response = "";
+		try {
+			dcSocket = new Socket(connectedDCIP,connectedDCPort);
+			JSONObject reqObj = new JSONObject();
+			reqObj.put("Authorization",configMap.get("authToken"));
+			reqObj.put("Operation", "READ");
+			reqObj.put("clientID", configMap.get("clientId"));
+			reqObj.put("variable", variable);
+			
+			SendMessage sm = new SendMessage();
+			String messageStr = reqObj.toString();
+			byte[] message = messageStr.getBytes();
+	    	response = sm.sendReq(dcSocket, message);
+	    	if(response.contains("ERR::")) {
+	    		System.out.println("RESPONSE: " + response);
+	    		return "";
+	    	}
+	    	
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
 	}
 	
 	public int postWriteMessage(String op, String variable, String writedata) {
-		int status = 0;
+		int status = 1;
+		String response = "";
+
+		try {
+			dcSocket = new Socket(connectedDCIP,connectedDCPort);
+			JSONObject reqObj = new JSONObject();
+			reqObj.put("Authorization",configMap.get("authToken"));
+			reqObj.put("Operation", "WRITE");
+			reqObj.put("clientID", configMap.get("clientId"));
+			reqObj.put("variable", variable);
+			reqObj.put("writedata", writedata);
+			
+			SendMessage sm = new SendMessage();
+			String messageStr = reqObj.toString();
+//			System.out.println("REQUEST: " + messageStr);
+			byte[] message = messageStr.getBytes();
+	    	response = sm.sendReq(dcSocket, message);
+	    	
+//	    	System.out.println("RESPONSE: " + response);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
-		
+    	if(!response.equals("SUCCESS")) {
+    		return 0;
+    	}
+    	
 		return status;
 	}
 	
 	public int postRegisterMessage() {
 		int status = 0;
-		JSONObject reqObj = new JSONObject();
-		reqObj.put("Authorization",configMap.get("authToken"));
-		reqObj.put("Operation", "Register");
-		reqObj.put("clientID", configMap.get("clientId"));
+
+		try {
+			dcSocket = new Socket(connectedDCIP,connectedDCPort);
+			JSONObject reqObj = new JSONObject();
+			reqObj.put("Authorization",configMap.get("authToken"));
+			reqObj.put("Operation", "Register");
+			reqObj.put("clientID", configMap.get("clientId"));
+			
+			SendMessage sm = new SendMessage();
+			String messageStr = reqObj.toString();
+			System.out.println("REQUEST: " + messageStr);
+			byte[] message = messageStr.getBytes();
+	    	String response = sm.sendReq(dcSocket, message);
+	    	
+	    	System.out.println("RESPONSE: " + response);
+	    	return 1;
+	    	
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		SendMessage sm = new SendMessage();
-		String messageStr = reqObj.toString();
-		System.out.println("REQUEST: " + messageStr);
-		byte[] message = messageStr.getBytes();
-    	String response = sm.sendReq(dcSocket, message);
-    	
-    	System.out.println("RESPONSE: " + response);
 		
 		return status;
 	}

@@ -17,18 +17,20 @@ public class ServerListener extends Thread {
 	private Socket socket;
 	private HashMap<String,String> configMap;
 	private JSONObject allData;
+	private JSONObject dataversions;
 	private JSONObject dependencyObj;
 	private int lamportClock;
 	
-	public ServerListener(int listenPort, HashMap <String,String> configMap, JSONObject ad, JSONObject dObj, int l) {
+	public ServerListener(int listenPort, HashMap <String,String> configMap, JSONObject ad, JSONObject dObj, int l, JSONObject dv) {
 		this.listenPort = listenPort;
 		this.configMap = configMap;
 		this.allData = ad;
 		this.dependencyObj = dObj;
 		this.lamportClock = l;
+		this.dataversions = dv;
 	}
 	
-	//This is the main listener run method for the Server's thread.
+		//This is the main listener run method for the Server's thread.
 		@Override
 		public void run() {
 			System.out.println("Starting DataCenter...");
@@ -73,7 +75,7 @@ public class ServerListener extends Thread {
 		}
 		
 		private String processInputMessage(String inputStr) {
-			String res = "Nothing to process";
+			String res = "ERR::Nothing to process";
 			try {
 				JSONObject mObj = new JSONObject(inputStr);
 				String operation = mObj.getString("Operation");
@@ -106,6 +108,30 @@ public class ServerListener extends Thread {
 					if(operation.equals("Register")){
 						dependencyObj.put(cid, new JSONArray());
 						return "Successfully registered cliend id :- " + cid + " with an empty dependency object";
+					}
+					//READ operation
+					else if(operation.equals("READ")) {
+						String variable = "";
+						variable = mObj.getString("variable");
+						if(allData.has(variable)) {
+							return allData.getString(variable);
+						}
+						else {
+							return "ERR::The variable " + variable + " is not present in this DC yet!!";
+						}
+					}
+					//WRITE operation
+					else if(operation.equals("WRITE")) {
+						String variable = "";
+						String writedata = "";
+						variable = mObj.getString("variable");
+						writedata = mObj.getString("writedata");
+						allData.put(variable, writedata);
+						dataversions.put(variable,lamportClock);
+						return "SUCCESS";
+					}
+					else {
+						return "ERR::Invalid operation from client. Allowed operations - Register, READ, WRITE";
 					}
 				}
 			}

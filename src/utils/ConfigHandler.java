@@ -50,6 +50,7 @@ public class ConfigHandler {
 				result.put("serverPort", prop.getProperty("serverPort"));
 				result.put("serverIP", prop.getProperty("serverIP"));
 				result.put("alldcs", prop.getProperty("alldcs"));
+				result.put("respectiveDelays", prop.getProperty("respectiveDelays"));
 				result.put("authToken", prop.getProperty("authToken"));
 			}
 			else if(type.equals("client")) {

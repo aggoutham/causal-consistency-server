@@ -15,6 +15,7 @@ public class StartServer {
 	private JSONArray otherdcs;
 	private static JSONObject allData = new JSONObject();
 	private static JSONObject dependencyObj = new JSONObject();
+	private static JSONObject dataVersions = new JSONObject();
 	private static int lamportClock = 0;
 	
 	public static void main(String[] args)  {
@@ -59,7 +60,7 @@ public class StartServer {
 		
 		//Spawn the Listener thread
 		ss.serverPort = Integer.parseInt(configMap.get("serverPort"));
-		ServerListener sl = new ServerListener(ss.serverPort, configMap, allData, dependencyObj, lamportClock);
+		ServerListener sl = new ServerListener(ss.serverPort, configMap, allData, dependencyObj, lamportClock, dataVersions);
 		sl.start();
 		
 		
