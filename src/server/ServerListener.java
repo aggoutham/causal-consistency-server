@@ -7,9 +7,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
+import writeUtil.ReplicatedWrite;
 
 public class ServerListener extends Thread {
 	
@@ -126,8 +126,14 @@ public class ServerListener extends Thread {
 						String writedata = "";
 						variable = mObj.getString("variable");
 						writedata = mObj.getString("writedata");
+						
 						allData.put(variable, writedata);
 						dataversions.put(variable,lamportClock);
+						
+						// In-Parallel starts a thread for replications
+						ReplicatedWrite rw = new ReplicatedWrite(configMap,cid,variable,writedata,dependencyObj);
+						rw.start();
+						
 						return "SUCCESS";
 					}
 					else {
