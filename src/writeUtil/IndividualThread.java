@@ -43,7 +43,6 @@ public class IndividualThread extends Thread {
 			
 			String sIP = otherDC.split(":")[0];
 			int sPort = Integer.parseInt(otherDC.split(":")[1]);
-			Socket ods = new Socket(sIP,sPort);
 			
 			JSONObject reqObj = new JSONObject();
 			reqObj.put("Authorization",configMap.get("authToken"));
@@ -64,9 +63,11 @@ public class IndividualThread extends Thread {
 //			System.out.println(reqObj.toString());
 //			System.out.println(dependencyObj.toString());
 //			System.out.println(cid);
+//			System.out.println("Replicating to :- " + otherDC);
 			Thread.sleep(Integer.parseInt(delay)*1000);
 			
-			
+
+			Socket ods = new Socket(sIP,sPort);
 			SendMessage sm = new SendMessage();
 			String messageStr = reqObj.toString();
 			byte[] message = messageStr.getBytes();

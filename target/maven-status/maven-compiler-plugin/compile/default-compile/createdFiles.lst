@@ -2,6 +2,7 @@ client/StartClient.class
 message/SendMessage.class
 utils/ConfigHandler.class
 writeUtil/IndividualThread.class
+server/ReplicatesHandler.class
 writeUtil/ReplicatedWrite.class
 server/StartServer.class
 clientCli/StartCli.class

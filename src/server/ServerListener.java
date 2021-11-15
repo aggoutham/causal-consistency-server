@@ -16,20 +16,23 @@ public class ServerListener extends Thread {
 	private int listenPort;
 	private Socket socket;
 	private HashMap<String,String> configMap;
-	private JSONObject allData;
-	private JSONObject dataversions;
-	private JSONObject dependencyObj;
+	private static JSONObject allData;
+	private static JSONObject dataversions;
+	private static JSONObject dependencyObj;
 	private int lamportClock;
 	private String ownDC;
+	private static ReplicatesHandler rh;
 	
 	public ServerListener(int listenPort, HashMap <String,String> configMap, JSONObject ad, JSONObject dObj, int l, JSONObject dv) {
 		this.listenPort = listenPort;
 		this.configMap = configMap;
-		this.allData = ad;
-		this.dependencyObj = dObj;
+		allData = ad;
+		dependencyObj = dObj;
 		this.lamportClock = l;
-		this.dataversions = dv;
+		dataversions = dv;
 		this.ownDC = configMap.get("serverIP") + ":" + configMap.get("serverPort");
+		
+		rh = new ReplicatesHandler(allData,dataversions);
 	}
 	
 		//This is the main listener run method for the Server's thread.
@@ -160,7 +163,8 @@ public class ServerListener extends Thread {
 						writedata = mObj.getString("writedata");
 						dObj = mObj.getJSONObject("dependency");
 						
-						
+						int s1 = rh.performReplication(variable,writedata,otherDC,dObj,mObj.getInt("SenderClockValue"));
+						int s2 = rh.tryQueuedObjects();
 						return "SUCCESS";
 						
 					}
