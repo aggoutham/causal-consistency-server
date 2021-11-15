@@ -52,12 +52,18 @@ public class IndividualThread extends Thread {
 			reqObj.put("variable", variable);
 			reqObj.put("writedata", writedata);
 			reqObj.put("SenderClockValue", lamportClock);
-			JSONArray dArr = new JSONArray();
-			if(dependencyObj.has(cid)) {
-				dArr = dependencyObj.getJSONArray(cid);
-			}
-			reqObj.put("dependency", dArr.toString());
+			JSONObject dObj = new JSONObject();
+
 			
+			
+			if(dependencyObj.has(cid)) {
+				dObj = dependencyObj.getJSONObject(cid);
+			}
+			reqObj.put("dependency", dObj);
+			
+//			System.out.println(reqObj.toString());
+//			System.out.println(dependencyObj.toString());
+//			System.out.println(cid);
 			Thread.sleep(Integer.parseInt(delay)*1000);
 			
 			

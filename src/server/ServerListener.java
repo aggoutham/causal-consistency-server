@@ -20,6 +20,7 @@ public class ServerListener extends Thread {
 	private JSONObject dataversions;
 	private JSONObject dependencyObj;
 	private int lamportClock;
+	private String ownDC;
 	
 	public ServerListener(int listenPort, HashMap <String,String> configMap, JSONObject ad, JSONObject dObj, int l, JSONObject dv) {
 		this.listenPort = listenPort;
@@ -28,6 +29,7 @@ public class ServerListener extends Thread {
 		this.dependencyObj = dObj;
 		this.lamportClock = l;
 		this.dataversions = dv;
+		this.ownDC = configMap.get("serverIP") + ":" + configMap.get("serverPort");
 	}
 	
 		//This is the main listener run method for the Server's thread.
@@ -87,7 +89,7 @@ public class ServerListener extends Thread {
 					cid = mObj.getString("clientID");
 				}
 				if(mObj.has("otherdcID")) {
-					cid = mObj.getString("otherdcID");
+					otherdcID = mObj.getString("otherdcID");
 				}
 				
 				///// Lamport Clock's Logic //////////////////
@@ -109,7 +111,7 @@ public class ServerListener extends Thread {
 				if(authToken.equals(configMap.get("authToken"))) {
 					//Register Operation
 					if(operation.equals("Register")){
-						dependencyObj.put(cid, new JSONArray());
+						dependencyObj.put(cid, new JSONObject());
 						return "Successfully registered cliend id :- " + cid + " with an empty dependency object";
 					}
 					//READ operation
@@ -117,6 +119,13 @@ public class ServerListener extends Thread {
 						String variable = "";
 						variable = mObj.getString("variable");
 						if(allData.has(variable)) {
+							
+							JSONObject temp = new JSONObject();
+							temp.put("version", dataversions.getInt(variable));
+							temp.put("dataCenter", ownDC);
+							//Add this read call to the client's dependency object
+							dependencyObj.getJSONObject(cid).put(variable,temp);
+							
 							return allData.getString(variable);
 						}
 						else {
@@ -144,12 +153,12 @@ public class ServerListener extends Thread {
 						String otherDC = "";
 						String variable = "";
 						String writedata = "";
-						JSONArray dArr = new JSONArray();
+						JSONObject dObj = new JSONObject();
 						
 						otherDC = mObj.getString("otherdcID");
 						variable = mObj.getString("variable");
 						writedata = mObj.getString("writedata");
-//						dArr = mObj.getJSONArray("dependency");
+						dObj = mObj.getJSONObject("dependency");
 						
 						
 						return "SUCCESS";
