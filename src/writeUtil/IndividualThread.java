@@ -1,10 +1,16 @@
 package writeUtil;
 
+import java.net.Socket;
+import java.util.HashMap;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import message.SendMessage;
+
 public class IndividualThread extends Thread {
-	
-	
+
+	private HashMap <String,String> configMap;
 	private String otherDC;
 	private String delay;
 	private String variable;
@@ -12,7 +18,9 @@ public class IndividualThread extends Thread {
 	private String cid;
 	private JSONObject dependencyObj;
 	private String ownDC;
-	public IndividualThread(String otherDC, String delay, String v, String w, String c, JSONObject dObj, String ownDC){
+	private int lamportClock;
+	
+	public IndividualThread(String otherDC, String delay, String v, String w, String c, JSONObject dObj, String ownDC, int l, HashMap <String,String> cm){
 		this.otherDC = otherDC;
 		this.delay = delay;
 		this.variable = v;
@@ -20,6 +28,8 @@ public class IndividualThread extends Thread {
 		this.cid = c;
 		this.dependencyObj = dObj;
 		this.ownDC = ownDC;
+		this.lamportClock = l;
+		this.configMap = cm;
 	}
 	
 	@Override
@@ -28,13 +38,37 @@ public class IndividualThread extends Thread {
 		if(otherDC.equals(ownDC)) {
 			return;
 		}
-		
 		try {
 			long tId = Thread.currentThread().getId();
-			Thread.sleep(10000);
+			
+			String sIP = otherDC.split(":")[0];
+			int sPort = Integer.parseInt(otherDC.split(":")[1]);
+			Socket ods = new Socket(sIP,sPort);
+			
+			JSONObject reqObj = new JSONObject();
+			reqObj.put("Authorization",configMap.get("authToken"));
+			reqObj.put("Operation", "REPLICATE");
+			reqObj.put("otherdcID", ownDC);
+			reqObj.put("variable", variable);
+			reqObj.put("writedata", writedata);
+			reqObj.put("SenderClockValue", lamportClock);
+			JSONArray dArr = new JSONArray();
+			if(dependencyObj.has(cid)) {
+				dArr = dependencyObj.getJSONArray(cid);
+			}
+			reqObj.put("dependency", dArr.toString());
+			
+			Thread.sleep(Integer.parseInt(delay)*1000);
+			
+			
+			SendMessage sm = new SendMessage();
+			String messageStr = reqObj.toString();
+			byte[] message = messageStr.getBytes();
+	    	String response = sm.sendReq(ods, message);
+			
 			System.out.println("Replicated to :- " + otherDC);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
 		}
 		return;
 	}

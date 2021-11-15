@@ -53,10 +53,10 @@ public class ServerListener extends Thread {
 			try {
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				message = (byte[]) in.readObject();
-				System.out.println("Server Received the following message :- ");
+				System.out.println("\n\nServer Received the following message :- ");
 				String str = new String(message, StandardCharsets.UTF_8);
 				System.out.println(str);
-				System.out.println("Server Printed the message above!!\n");
+				System.out.println("Server Printed the message above!!");
 				
 				
 				String respond = processInputMessage(str);
@@ -85,6 +85,9 @@ public class ServerListener extends Thread {
 				
 				if(mObj.has("clientID")) {
 					cid = mObj.getString("clientID");
+				}
+				if(mObj.has("otherdcID")) {
+					cid = mObj.getString("otherdcID");
 				}
 				
 				///// Lamport Clock's Logic //////////////////
@@ -131,10 +134,26 @@ public class ServerListener extends Thread {
 						dataversions.put(variable,lamportClock);
 						
 						// In-Parallel starts a thread for replications
-						ReplicatedWrite rw = new ReplicatedWrite(configMap,cid,variable,writedata,dependencyObj);
+						ReplicatedWrite rw = new ReplicatedWrite(configMap,cid,variable,writedata,dependencyObj,lamportClock);
 						rw.start();
 						
 						return "SUCCESS";
+					}
+					else if(operation.equals("REPLICATE")) {
+						
+						String otherDC = "";
+						String variable = "";
+						String writedata = "";
+						JSONArray dArr = new JSONArray();
+						
+						otherDC = mObj.getString("otherdcID");
+						variable = mObj.getString("variable");
+						writedata = mObj.getString("writedata");
+//						dArr = mObj.getJSONArray("dependency");
+						
+						
+						return "SUCCESS";
+						
 					}
 					else {
 						return "ERR::Invalid operation from client. Allowed operations - Register, READ, WRITE";
