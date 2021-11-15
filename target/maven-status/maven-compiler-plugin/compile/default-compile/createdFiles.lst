@@ -1,5 +1,6 @@
 client/StartClient.class
-server/StartServer.class
+message/SendMessage.class
 utils/ConfigHandler.class
+server/StartServer.class
 clientCli/StartCli.class
 server/ServerListener.class
