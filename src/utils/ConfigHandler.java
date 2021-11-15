@@ -8,31 +8,29 @@ import java.util.HashMap;
 import java.util.Properties;
 
 /*This class is a ONE-STOP SOLUTION for reading configuration for the entire system.
- *First it looks for an environment variable "CSE513_LAB2_PATH"
+ *First it looks for an argument sent while invoking main function in StartServer.java
  *
- *If the env variable is present, it looks for a file "config.properties" in that PATH.
+ *If the argument value is present, it looks for a file "config.properties" in that PATH.
  *If found, this file will DICTATE the properties of the entire system.
  *
- *Else, if the env variable is NULL, then by default we use "config.properties" in resources folder in our code base.
+ *Else, if there is an issue with this file, then by default we use "config.properties" in resources folder in our code base.
  * */
 public class ConfigHandler {
 	
 	HashMap<String, String> result = new HashMap<>();
 	InputStream inputStream;
  
-	public HashMap<String, String> getPropValues() throws IOException {
+	public HashMap<String, String> getPropValues(String configPath, String type) throws IOException {
 		
-		String ptopdirectory = System.getenv("CSE513_LAB2_PATH");
 		
 		
 		try {
 			Properties prop = new Properties();
 			String propFileName = "config.properties";
 			
-			//If CSE513_LAB2_PATH environment variable exists, then use that as the directory to find properties file.
-			if(ptopdirectory != null) {
+			if(configPath != null) {
 				try {
-				    prop.load(new FileInputStream(ptopdirectory + "/config.properties"));
+				    prop.load(new FileInputStream(configPath));
 				} catch (IOException e) {
 				    e.printStackTrace();
 				}
@@ -48,7 +46,15 @@ public class ConfigHandler {
 				}
 			}
 			
-			result.put("sample", prop.getProperty("SAMPLE"));
+			if(type.equals("server")) {
+				result.put("serverPort", prop.getProperty("serverPort"));
+				result.put("serverIP", prop.getProperty("serverIP"));
+				result.put("alldcs", prop.getProperty("alldcs"));
+			}
+			else if(type.equals("client")) {
+				result.put("clientId", prop.getProperty("clientId"));
+				result.put("connectedDC", prop.getProperty("connectedDC"));
+			}
 			
 		} catch (Exception e) {
 			System.out.println("Exception: " + e);

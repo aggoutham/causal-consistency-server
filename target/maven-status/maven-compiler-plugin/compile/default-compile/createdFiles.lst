@@ -1,0 +1,5 @@
+client/StartClient.class
+server/StartServer.class
+utils/ConfigHandler.class
+clientCli/StartCli.class
+server/ServerListener.class
