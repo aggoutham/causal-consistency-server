@@ -64,8 +64,8 @@ public class ReplicatesHandler {
 		else {
 			allData.put(variable, writedata);
 			dataversions.put(variable, SenderClockValue);
+			System.out.println("ALL DEPENDENCIES WERE SATISFIED. Replication Successful!!");
 		}
-		
 		
 		
 		return status;
