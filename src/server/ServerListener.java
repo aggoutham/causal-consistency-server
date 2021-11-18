@@ -11,6 +11,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import writeUtil.ReplicatedWrite;
 
+/*
+ * This class opens the DC server socket for external communication and to receive requests.
+ * This class extends a Thread and run asynchronously to other handlers. It updates the static Data Structures
+ * defined by StartServer.java to ensure causal consistency.
+ */
 public class ServerListener extends Thread {
 	
 	private int listenPort;

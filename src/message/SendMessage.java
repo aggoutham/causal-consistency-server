@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 public class SendMessage {
 	
-	//Utility to send requests and recieve responses used throughout the project.
+	//Utility to send requests and receive responses used throughout the project.
 	public String sendReq(Socket socket, byte[] message){
 		String response = "FAILURE";
 		try {

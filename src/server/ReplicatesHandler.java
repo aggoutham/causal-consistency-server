@@ -5,6 +5,14 @@ import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/*
+ * Once there is a REPLICATE request that reaches the Data Center Server, this class is called.
+ * If the REPLICATE request has no dependencies, then the WRITE is processed immediately.
+ * If the REPLICATE request has some dependencies, then this class checks all the dependencies for version validation.
+ * 
+ * If all dependencies are cleared, it will then process the WRITE request in this DC.
+ * Else, it maintains a queue "queuedWrites" which will be processed every time the next REPLICATE arrives.
+ */
 public class ReplicatesHandler {
 	
 	public static JSONArray queuedWrites = new JSONArray();
@@ -17,6 +25,7 @@ public class ReplicatesHandler {
 		
 	}
 	
+	//Dependency checking for a new replicate write
 	public int performReplication(String variable, String writedata, String otherDC, JSONObject dObj, int SenderClockValue) {
 		
 		int status = 1;
@@ -73,7 +82,7 @@ public class ReplicatesHandler {
 
 
 	
-	
+	//Every time there is a new replicate request, the server tries to clear the Queue Backlog to see if any replicate writes can be cleared now.
 	public int tryQueuedObjects() {
 		JSONArray newqueue = new JSONArray();
 		

@@ -6,6 +6,10 @@ import java.util.HashMap;
 import clientCli.StartCli;
 import utils.ConfigHandler;
 
+/*
+ * This class is to begin a CLient server in the distributed replication system.
+ * It checks for the right configurations and starts an interactive CLI thread.
+ */
 public class StartClient {
 	
 	

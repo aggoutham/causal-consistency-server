@@ -15,6 +15,11 @@ public class ReplicatedWrite extends Thread {
 	private String ownDC;
 	private int lamportClock;
 	
+	/*
+	 * Every WRITE in a DC needs to be replicated in ALL other DCs.
+	 * This cannot block the DC servers main thread. Hence the replication has to be done in a multi-thread fashion.
+	 * This class orchestrates the entire REPLICATE_WRITE requests to other DCs in an asynchronous way.
+	 */
 	public ReplicatedWrite(HashMap <String,String> cm, String c, String v, String w, JSONObject dObj, int l){
 		this.configMap = cm;
 		this.cid = c;

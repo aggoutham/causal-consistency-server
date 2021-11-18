@@ -9,6 +9,9 @@ import org.json.JSONObject;
 
 import message.SendMessage;
 
+/*
+ * This class is the primary Client Thread that begins the Interactive CLI for the user to send READ, WRITE commands.
+ */
 public class StartCli {
 	
 	private HashMap<String,String> configMap;
@@ -69,7 +72,7 @@ public class StartCli {
 	}
 	
 	
-	
+	// This method processes different types of user inputs provided in the Interactive commanc Shell.
 	public void processInput(String userInput) {
 		String[] parts = userInput.split(",");
 		String variable = "";
@@ -110,7 +113,7 @@ public class StartCli {
 
 	
 	
-	
+	//This method handles a READ message
 	public String postReadMessage(String op, String variable) {
 		String response = "";
 		try {
@@ -137,6 +140,7 @@ public class StartCli {
 		return response;
 	}
 	
+	//This method handles a WRITE message
 	public int postWriteMessage(String op, String variable, String writedata) {
 		int status = 1;
 		String response = "";
@@ -152,13 +156,10 @@ public class StartCli {
 			
 			SendMessage sm = new SendMessage();
 			String messageStr = reqObj.toString();
-//			System.out.println("REQUEST: " + messageStr);
 			byte[] message = messageStr.getBytes();
 	    	response = sm.sendReq(dcSocket, message);
 	    	
-//	    	System.out.println("RESPONSE: " + response);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -169,6 +170,7 @@ public class StartCli {
 		return status;
 	}
 	
+	//This method handles the initial REGISTER request when the client first connects to its DC.
 	public int postRegisterMessage() {
 		int status = 0;
 

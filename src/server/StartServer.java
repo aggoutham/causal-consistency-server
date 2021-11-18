@@ -9,6 +9,13 @@ import org.json.JSONObject;
 import clientCli.StartCli;
 import utils.ConfigHandler;
 
+/*
+ * This class starts the Data Center Server. It reads the relevant configurations first 
+ * and spawns the listener thread.
+ * 
+ * It also maintains three static data structures namely allData, dependencyObj and dataVersions 
+ * that are highly useful for maintaining causal consistency.
+ */
 public class StartServer {
 
 	private int serverPort;
@@ -21,9 +28,6 @@ public class StartServer {
 	public static void main(String[] args)  {
 		
 		StartServer ss = new StartServer();
-		
-		///
-		
 		String configPath = args[0];
 		int type = Integer.parseInt(args[1]);
 		

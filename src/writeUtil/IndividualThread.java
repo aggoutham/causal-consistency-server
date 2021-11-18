@@ -8,6 +8,9 @@ import org.json.JSONObject;
 
 import message.SendMessage;
 
+/*
+ * This class is the lowest level thread implementation that serves replication request to ONE other DC.
+ */
 public class IndividualThread extends Thread {
 
 	private HashMap <String,String> configMap;
